@@ -8,6 +8,8 @@ function GameManager(size, InputManager, Actuator, StorageManager) {
 
   this.inputManager.on("move", this.move.bind(this));
   this.inputManager.on("restart", this.restart.bind(this));
+  this.inputManager.on("load", this.load.bind(this));
+  this.inputManager.on("save", this.save.bind(this));
   this.inputManager.on("keepPlaying", this.keepPlaying.bind(this));
 
   this.setup();
@@ -18,6 +20,34 @@ GameManager.prototype.restart = function () {
   this.storageManager.clearGameState();
   this.actuator.continueGame(); // Clear the game won/lost message
   this.setup();
+};
+
+// Load the game
+GameManager.prototype.load = function (name) {
+  this.storageManager.clearGameState();
+  var previousState = this.storageManager.loadGameState(name);
+  this.actuator.continueGame(); // Clear the game won/lost message
+  this.grid        = new Grid(previousState.grid.size,
+      previousState.grid.cells); // Reload grid
+  this.score       = previousState.score;
+  this.over        = previousState.over;
+  this.won         = previousState.won;
+  this.keepPlaying = previousState.keepPlaying;
+  this.actuate();
+};
+
+// Save game
+GameManager.prototype.save = function (name) {
+  this.storageManager.clearGameState();
+  var previousState = this.storageManager.loadGameState(name);
+  this.actuator.continueGame(); // Clear the game won/lost message
+  this.grid        = new Grid(previousState.grid.size,
+      previousState.grid.cells); // Reload grid
+  this.score       = previousState.score;
+  this.over        = previousState.over;
+  this.won         = previousState.won;
+  this.keepPlaying = previousState.keepPlaying;
+  this.actuate();
 };
 
 // Keep playing after winning (allows going over 2048)
