@@ -59,13 +59,37 @@ LocalStorageManager.prototype.setGameState = function (gameState) {
   this.storage.setItem(this.gameStateKey, JSON.stringify(gameState));
 };
 
+LocalStorageManager.prototype.getGameList = function () {
+  var stateJSON = this.storage.getItem(this.gameListKey);
+  stateJSON = stateJSON ? JSON.parse(stateJSON) : null;
+  if (!Array.isArray(stateJSON)) { // Convert to an array
+    var arr = [stateJSON];
+    this.storage.setItem(this.gameListKey, JSON.stringify(arr));
+    stateJSON = arr;
+  }
+  return stateJSON ? stateJSON : null;
+};
+
 LocalStorageManager.prototype.loadGameState = function (name) {
   var stateJSON = this.storage.getItem(this.gameListKey+name);
   return stateJSON ? JSON.parse(stateJSON) : null;
 };
 
 LocalStorageManager.prototype.saveGameState = function (name, gameState) {
-  this.storage.setItem(this.gameListKey, name);
+  var stateJSON = this.storage.getItem(this.gameListKey);
+  stateJSON = stateJSON ? JSON.parse(stateJSON) : null;
+  if (stateJSON === undefined || stateJSON === null) {
+    stateJSON = [];
+  }
+
+  var idx = stateJSON.indexOf(name);
+  if (idx === -1) {
+    stateJSON.push(name)
+  } else {
+    stateJSON[idx] = name
+  }
+
+  this.storage.setItem(this.gameListKey, JSON.stringify(stateJSON));
   this.storage.setItem(this.gameListKey+name, JSON.stringify(gameState));
 };
 

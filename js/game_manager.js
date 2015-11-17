@@ -38,24 +38,36 @@ GameManager.prototype.load = function (name) {
 
 // Save game
 GameManager.prototype.save = function (name) {
-  alert('hi');
-  return;
-  this.storageManager.clearGameState();
-  var previousState = this.storageManager.loadGameState(name);
-  this.actuator.continueGame(); // Clear the game won/lost message
-  this.grid        = new Grid(previousState.grid.size,
-      previousState.grid.cells); // Reload grid
-  this.score       = previousState.score;
-  this.over        = previousState.over;
-  this.won         = previousState.won;
-  this.keepPlaying = previousState.keepPlaying;
-  this.actuate();
+  var previousState = {grid:{}};
+  var grid = this.grid.serialize();
+  previousState.grid.size = grid.size;
+  previousState.grid.cells = grid.cells;
+  previousState.score = this.score;
+  previousState.over = this.over;
+  previousState.won = this.won;
+  previousState.keepPlaying = this.keepPlaying;
+  this.storageManager.saveGameState(name, previousState);
+  this.refreshGameList();
 };
 
 // Keep playing after winning (allows going over 2048)
 GameManager.prototype.keepPlaying = function () {
   this.keepPlaying = true;
   this.actuator.continueGame(); // Clear the game won/lost message
+};
+
+GameManager.prototype.refreshGameList = function () {
+  var listDiv = document.querySelector("#savedGameList");
+  var gameList = this.storageManager.getGameList();
+  gameList.forEach(function (it) {
+    var a = document.createElement('a');
+    var linkText = document.createTextNode(it);
+    a.appendChild(linkText);
+    a.title = it;
+    a.href = "http://example.com";
+    listDiv.appendChild(a);
+    listDiv.appendChild(document.createElement('br'));
+  });
 };
 
 // Return true if the game is lost, or has won and the user hasn't kept playing
@@ -85,6 +97,8 @@ GameManager.prototype.setup = function () {
     // Add the initial tiles
     this.addStartTiles();
   }
+
+  this.refreshGameList();
 
   // Update the actuator
   this.actuate();
