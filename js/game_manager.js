@@ -38,6 +38,8 @@ GameManager.prototype.load = function (name) {
 
 // Save game
 GameManager.prototype.save = function (name) {
+  alert('hi');
+  return;
   this.storageManager.clearGameState();
   var previousState = this.storageManager.loadGameState(name);
   this.actuator.continueGame(); // Clear the game won/lost message
