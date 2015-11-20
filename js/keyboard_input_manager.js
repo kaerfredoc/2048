@@ -76,6 +76,7 @@ KeyboardInputManager.prototype.listen = function () {
   this.bindButtonPress(".restart-button", this.restart);
   this.bindButtonPress("#save-button", this.save);
   this.bindButtonPress(".keep-playing-button", this.keepPlaying);
+  this.bindButtonPress("#clear-link", this.clearState);
 
   // Respond to swipe events
   var touchStartClientX, touchStartClientY;
@@ -136,6 +137,11 @@ KeyboardInputManager.prototype.listen = function () {
 KeyboardInputManager.prototype.restart = function (event) {
   event.preventDefault();
   this.emit("restart");
+};
+
+KeyboardInputManager.prototype.clearState = function (event) {
+  event.preventDefault();
+  this.emit("clearState");
 };
 
 KeyboardInputManager.prototype.save = function (event) {
