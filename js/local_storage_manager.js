@@ -60,14 +60,15 @@ LocalStorageManager.prototype.setGameState = function (gameState) {
 };
 
 LocalStorageManager.prototype.getGameList = function () {
-  var stateJSON = this.storage.getItem(this.gameListKey);
-  stateJSON = stateJSON ? JSON.parse(stateJSON) : null;
-  if (!Array.isArray(stateJSON)) { // Convert to an array
-    var arr = [stateJSON];
+  var gameListArr = this.storage.getItem(this.gameListKey);
+  if (gameListArr === null) return [];
+  gameListArr = (gameListArr ? JSON.parse(gameListArr) : []);
+  if (!Array.isArray(gameListArr)) { // Convert to an array
+    var arr = [gameListArr];
     this.storage.setItem(this.gameListKey, JSON.stringify(arr));
-    stateJSON = arr;
+    gameListArr = arr;
   }
-  return stateJSON ? stateJSON : null;
+  return gameListArr ? gameListArr : [];
 };
 
 LocalStorageManager.prototype.loadGameState = function (name) {
@@ -76,6 +77,7 @@ LocalStorageManager.prototype.loadGameState = function (name) {
 };
 
 LocalStorageManager.prototype.saveGameState = function (name, gameState) {
+  // Store the name in the list
   var stateJSON = this.storage.getItem(this.gameListKey);
   stateJSON = stateJSON ? JSON.parse(stateJSON) : null;
   if (stateJSON === undefined || stateJSON === null) {
@@ -88,9 +90,10 @@ LocalStorageManager.prototype.saveGameState = function (name, gameState) {
   } else {
     stateJSON[idx] = name
   }
+  this.storage.setItem((this.gameListKey), JSON.stringify(stateJSON));
 
-  this.storage.setItem(this.gameListKey, JSON.stringify(stateJSON));
-  this.storage.setItem(this.gameListKey+name, JSON.stringify(gameState));
+  // Store the actual state
+  this.storage.setItem((this.gameListKey+name), JSON.stringify(gameState));
 };
 
 LocalStorageManager.prototype.clearGameState = function () {

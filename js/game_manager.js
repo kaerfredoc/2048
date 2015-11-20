@@ -33,20 +33,16 @@ GameManager.prototype.load = function (name) {
   this.over        = previousState.over;
   this.won         = previousState.won;
   this.keepPlaying = previousState.keepPlaying;
+  var gameNameInput = document.querySelector("#gameName");
+  gameNameInput.value = name;
   this.actuate();
 };
 
 // Save game
 GameManager.prototype.save = function (name) {
-  var previousState = {grid:{}};
-  var grid = this.grid.serialize();
-  previousState.grid.size = grid.size;
-  previousState.grid.cells = grid.cells;
-  previousState.score = this.score;
-  previousState.over = this.over;
-  previousState.won = this.won;
-  previousState.keepPlaying = this.keepPlaying;
-  this.storageManager.saveGameState(name, previousState);
+  if (!name || name === undefined) return;
+  this.actuate();
+  this.storageManager.saveGameState(name, this.storageManager.getGameState());
   this.refreshGameList();
 };
 
@@ -59,12 +55,14 @@ GameManager.prototype.keepPlaying = function () {
 GameManager.prototype.refreshGameList = function () {
   var listDiv = document.querySelector("#savedGameList");
   var gameList = this.storageManager.getGameList();
+
+  listDiv.innerHTML = "";
   gameList.forEach(function (it) {
     var a = document.createElement('a');
     var linkText = document.createTextNode(it);
     a.appendChild(linkText);
     a.title = it;
-    a.href = "http://example.com";
+    a.onclick = function(){ gameManager.load(it); };
     listDiv.appendChild(a);
     listDiv.appendChild(document.createElement('br'));
   });
